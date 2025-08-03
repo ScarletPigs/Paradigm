@@ -178,19 +178,64 @@ Fired when a new zone becomes available for operations.
 }, []]] call para_g_fnc_event_add_handler;
 ```
 
-#### `zoneCaptured`
+#### `zoneCompleted`
 Fired when a zone is successfully captured by players.
 
 **Parameters:**
 - `_zoneName` [String] - Name of the captured zone
 - `_captureData` [Array] - Capture completion details
 
-#### `zoneContested`
-Fired when a zone becomes contested (combat active).
+#### `zoneActivated`
+Fired when a zone becomes populated with AI objectives (becomes contested).
 
 **Parameters:**
-- `_zoneName` [String] - Name of the contested zone
-- `_contestData` [Array] - Contest status information
+- `_zoneName` [String] - Name of the zone that became active
+
+**Example:**
+```sqf
+["zoneActivated", [{
+    params ["_handlerParams", "_eventParams"];
+    _handlerParams params [];
+    _eventParams params ["_zoneName"];
+    systemChat format ["Zone %1 is now contested!", _zoneName];
+}, []]] call para_g_fnc_event_add_handler;
+```
+
+**Dispatch:**
+```sqf
+["zoneActivated", [_zoneName]] call para_g_fnc_event_dispatch;
+```
+
+#### `zoneDeactivated`
+Fired when a zone cleans all AI objectives (no longer contested).
+
+**Parameters:**
+- `_zoneName` [String] - Name of the zone that became inactive
+
+**Example:**
+```sqf
+["zoneDeactivated", [{
+    params ["_handlerParams", "_eventParams"];
+    _handlerParams params [];
+    _eventParams params ["_zoneName"];
+    systemChat format ["Zone %1 is no longer contested", _zoneName];
+}, []]] call para_g_fnc_event_add_handler;
+```
+
+**Dispatch:**
+```sqf
+["zoneDeactivated", [_zoneName]] call para_g_fnc_event_dispatch;
+```
+
+#### Zone Event Types
+The zone system distinguishes between different types of zone states:
+
+- **`zoneOpened`** - Zone becomes available for tasks (director system)
+- **`zoneCompleted`** - Zone is captured/secured by players (director system)  
+- **`zoneActivated`** - Zone gains AI objectives and becomes contested (AI system)
+- **`zoneDeactivated`** - Zone loses all AI objectives, no longer contested (AI system)
+
+A zone can be "opened" by the director but not "activated" if no AI objectives are spawned yet. Conversely, a zone can lose its AI objectives (become "deactivated") but still remain "opened" by the director system.
 
 ### Building Feature Events
 
